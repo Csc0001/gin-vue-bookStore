@@ -15,9 +15,17 @@ import (
 
 func Register(c *gin.Context){
 	DB := common.GetDB()
-	name := c.PostForm("name")
-	tel := c.PostForm("tel")
-	password := c.PostForm("password")
+	// 使用map获取参数
+	//var requestMap = make(map[string]string)
+	//json.NewDecoder(c.Request.Body).Decode(&requestMap)
+	// 使用结构体
+	 var requestUser =model.User{}
+	//json.NewDecoder(c.Request.Body).Decode(&requestUser)
+	 c.Bind(&requestUser)
+	//获取参数
+	name := requestUser.Name
+	tel := requestUser.Tel
+	password := requestUser.Password
 	//手机号长度
 	if len(tel) != 11{
 		response.Response(c,http.StatusUnprocessableEntity,422,nil,"手机号长度必须为11位")
@@ -34,7 +42,7 @@ func Register(c *gin.Context){
 	//手机号已存在不允许注册
 	if isTelephoneExit(DB,tel){
 		response.Response(c,http.StatusUnprocessableEntity,422,nil,"用户已存在")
-
+		return
 	}
 	//创建用户
 	hashedPassword,err := bcrypt.GenerateFromPassword([]byte(password),bcrypt.DefaultCost)
@@ -49,7 +57,14 @@ func Register(c *gin.Context){
 	}
 	DB.Create(&newUser)
 	log.Println(name,tel,password)
-	response.Success(c,nil,"注册成功")
+	//发放token
+	token, err := common.ReleaseTocken(newUser)
+	if err != nil {
+		response.Response(c,http.StatusInternalServerError,500,nil,"系统异常")
+		log.Printf("token gennerate error: %v",err)
+		return
+	}
+	response.Success(c,gin.H{"token":token},"注册成功")
 }
 
 

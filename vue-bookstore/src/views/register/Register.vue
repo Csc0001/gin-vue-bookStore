@@ -55,9 +55,8 @@
 
 <script>
 import { required, minLength } from 'vuelidate/lib/validators';
-// import maxLength from 'vuelidate/lib/validators/maxLength';
-
 import customValidtor from '@/helper/validtor';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'userRegister',
@@ -86,17 +85,31 @@ export default {
     },
   },
   methods: {
+    ...mapMutations('userModule', ['SET_TOKEN', 'SET_USERINFO']),
     validateState(name) {
       // es6解构赋值
       const { $dirty, $error } = this.$v.user[name];
       return $dirty ? !$error : null;
     },
     register() {
-      if (this.user.tel.length !== 11) {
-        this.validation = false;
+      // 验证数据
+      this.$v.user.$touch();
+      if (this.$v.user.$anyError) {
         return;
       }
-      this.validation = true;
+      // 请求
+      this.$store.dispatch('userModule/register', this.user).then(() => {
+        // 跳转主页
+        console.log('111`1');
+        this.$router.replace({ name: 'home' });
+      }).catch((err) => {
+        console.log(err);
+        this.$bvToast.toast(err.response.data.msg, {
+          title: '数据验证错误',
+          variant: 'danger',
+          solid: true,
+        });
+      });
       console.log('register');
     },
   },

@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 import Vuelidate from 'vuelidate';
+import axios from 'axios';
+import VueAxios from 'vue-axios';
+
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -8,8 +11,11 @@ import './assets/scss/index.scss';
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
-Vue.use(Vuelidate);
+Vue.use(Vuelidate);// vueldate
 Vue.use(IconsPlugin);
+Vue.prototype.$http = axios;
+Vue.use(axios, VueAxios);// axios
+
 new Vue({
   router,
   store,
