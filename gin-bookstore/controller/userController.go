@@ -12,7 +12,7 @@ import (
 	"log"
 	"net/http"
 )
-
+//注册
 func Register(c *gin.Context){
 	DB := common.GetDB()
 	// 使用map获取参数
@@ -68,11 +68,15 @@ func Register(c *gin.Context){
 }
 
 
-
+//登录
 func Login(c *gin.Context){
 	DB := common.GetDB()
-	tel := c.PostForm("tel")
-	password := c.PostForm("password")
+	var requestUser =model.User{}
+	//json.NewDecoder(c.Request.Body).Decode(&requestUser)
+	c.Bind(&requestUser)
+	//获取参数
+	tel := requestUser.Tel
+	password := requestUser.Password
 	//手机号长度
 	if len(tel) != 11{
 		response.Response(c,http.StatusUnprocessableEntity,422,nil,"手机号长度必须为11位")
@@ -81,7 +85,6 @@ func Login(c *gin.Context){
 	//密码不少于6位
 	if len(password) < 6{
 		response.Response(c,http.StatusUnprocessableEntity,422,nil,"密码长度不少于6位")
-		return
 	}
 	//判断手机号是否存在
 	var user model.User
@@ -105,11 +108,12 @@ func Login(c *gin.Context){
 	response.Success(c,gin.H{"token":token},"登录成功")
 	return
 }
+//获取用户信息
 func Info(ctx *gin.Context){
 	user,_ := ctx.Get("user")//对应中间件的Set，从上下文获取用户信息
 	response.Success(ctx,gin.H{"user":dto.ToUserDto(user.(model.User))},"获取成功")
 }
-
+//查找电话是否存在
 func isTelephoneExit(db *gorm.DB,tel string)bool{
 	var user model.User
 	db.Where("tel=?",tel).First(&user)

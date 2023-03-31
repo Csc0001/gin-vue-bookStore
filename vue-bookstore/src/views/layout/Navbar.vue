@@ -29,8 +29,8 @@
               <template #button-content>
                 <em>{{userInfo.name}}</em>
               </template>
-              <b-dropdown-item href="#">个人主页</b-dropdown-item>
-              <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+              <b-dropdown-item @click="$router.push({name:'profile'})">个人主页</b-dropdown-item>
+              <b-dropdown-item @click="logout">登出</b-dropdown-item>
 
             </b-nav-item-dropdown>
             <b-nav-item
@@ -50,13 +50,13 @@
   </div>
 </template>
 <script>
+import { mapActions, mapState } from 'vuex';
 
 export default {
   name: 'myNavbar',
-  computed: {
-    userInfo() {
-      return this.$store.state.userModule.userInfo;
-    },
-  },
+  computed: mapState({
+    userInfo: (state) => state.userModule.userInfo,
+  }),
+  methods: mapActions('userModule', ['logout']),
 };
 </script>

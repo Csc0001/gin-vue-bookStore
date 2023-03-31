@@ -50,6 +50,7 @@ import { required, minLength } from 'vuelidate/lib/validators';
 // import maxLength from 'vuelidate/lib/validators/maxLength';
 
 import customValidtor from '@/helper/validtor';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'userLogin',
@@ -74,18 +75,31 @@ export default {
     },
   },
   methods: {
+    ...mapActions('userModule', { userLogin: 'login' }),
     validateState(name) {
       // es6解构赋值
       const { $dirty, $error } = this.$v.user[name];
       return $dirty ? !$error : null;
     },
     login() {
-      if (this.user.tel.length !== 11) {
-        this.validation = false;
+      // 验证数据
+      this.$v.user.$touch();
+      if (this.$v.user.$anyError) {
         return;
       }
-      this.validation = true;
-      console.log('register');
+      // 请求
+      this.userLogin(this.user).then(() => {
+        // 跳转主页
+        this.$router.replace({ name: 'home' });
+      }).catch((err) => {
+        console.log(err);
+        this.$bvToast.toast(err.response.data.msg, {
+          title: '数据验证错误',
+          variant: 'danger',
+          solid: true,
+        });
+      });
+      console.log('login');
     },
   },
 };

@@ -34,6 +34,7 @@ func ReleaseTocken(user model.User)(string,error){
 
 func ParseToken(tokenString string)(*jwt.Token,*Claims,error){
 	claims := &Claims{}
+	//keyFunc将接收解析的令牌，并应返回用于验证的密钥。
 	token,err := jwt.ParseWithClaims(tokenString,claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey,nil
 	})
