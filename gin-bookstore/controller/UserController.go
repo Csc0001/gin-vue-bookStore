@@ -77,6 +77,10 @@ func Login(c *gin.Context){
 	//获取参数
 	tel := requestUser.Tel
 	password := requestUser.Password
+	log.Println("------")
+
+	log.Println(tel,password)
+	log.Println("------")
 	//手机号长度
 	if len(tel) != 11{
 		response.Response(c,http.StatusUnprocessableEntity,422,nil,"手机号长度必须为11位")
