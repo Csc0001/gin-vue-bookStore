@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"gin-vue-bookStore/common"
 	"gin-vue-bookStore/model"
 	"gin-vue-bookStore/response"
@@ -13,7 +12,6 @@ import (
 func AuthMiddleware()gin.HandlerFunc  {
 	return func(ctx *gin.Context){
 		tokenString := ctx.GetHeader("Authorization")
-		fmt.Println(tokenString)
 		if tokenString == "" || !strings.HasPrefix(tokenString,"Bearer "){
 			response.Response(ctx,http.StatusUnauthorized,401,nil,"错误的token格式")
 			ctx.Abort()
